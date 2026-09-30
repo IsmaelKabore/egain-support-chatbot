@@ -1,7 +1,8 @@
 # eGain Package Assistant
 
 My take-home project for eGain. It's a chatbot called Ava that helps a customer
-when their package says "delivered" but they can't find it.
+when their package says "delivered" but they can't find it. Ava works for a
+made-up store, TechWorld, and runs on eGain.
 
 To try it, just open `index.html` in your browser. Nothing to install.
 
@@ -24,8 +25,12 @@ so she knows what kind of answer to expect.
 
 Once the package is found in the system, Ava guides the search one spot at a time:
 side entrance, front door, mailroom, neighbors, then the delivery photo. If it's
-still missing and it's been more than 24 hours, she can open a claim (with a claim
-number and a date to follow up) or pass the customer to an agent.
+still missing, she checks the delivery time herself instead of asking. After 24
+hours she offers to open a claim (with a claim number and a date to follow up) or
+pass the customer to an agent. Before that, she asks them to wait a day.
+
+The delivery time is always 30 hours before you open the page. Change
+`HOURS_SINCE_DELIVERY` in `flow.js` to 5 to see the "wait a day" path.
 
 You can click the buttons or type. Ava understands things like "yeah", "nope, I
 already checked", "talk to someone" or "that's not my door". If she doesn't

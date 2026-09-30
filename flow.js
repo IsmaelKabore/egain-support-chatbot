@@ -1,14 +1,22 @@
 // DEMO PACKAGE
 
+const HOURS_SINCE_DELIVERY = 30;
+
+const deliveredAt = new Date(Date.now() - HOURS_SINCE_DELIVERY * 60 * 60 * 1000);
+
 const PACKAGE = {
   tracking: "1Z999AA10123456784",
   store: "TechWorld",
   item: "Wireless Headphones",
-  delivered: "Mon, Sep 29 at 2:17 PM",
+  delivered: deliveredAt.toLocaleString("en-US", {
+    weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+  }),
   address: "Sunnyvale, CA 94086",
   carrier: "UPS",
   note: "Left near side entrance.",
 };
+
+const OVER_24_HOURS = HOURS_SINCE_DELIVERY > 24;
 
 
 // CLAIM
@@ -53,7 +61,7 @@ function checkSpot(text, nextSpot) {
 const FLOW = {
   start: {
     onEnter: () => (claim = null),
-    text: "Hi, I'm Ava from eGain. How can I help you today?",
+    text: "Hi, I'm Ava, TechWorld's support assistant. How can I help you today?",
     replies: [
       ["My package is missing", "askTracking"],
       ["Track my package", "askTracking"],
@@ -108,7 +116,7 @@ const FLOW = {
 
   found: {
     ...checkSpot(
-      `I found your delivery details. It was delivered ${PACKAGE.delivered}, and the driver wrote: "${PACKAGE.note}" Could you check beside the side entrance first, including behind anything nearby? Did you find it?`,
+      `I found your delivery details. It was delivered on ${PACKAGE.delivered}, and the driver wrote: "${PACKAGE.note}" Could you check beside the side entrance first, including behind anything nearby? Did you find it?`,
       "front"
     ),
     card: "package",
@@ -135,12 +143,12 @@ const FLOW = {
   photo: {
     ...checkSpot(
       "One last idea. Here's the photo the driver took: the box is on a dark doormat in front of a gray door, with a stone wall on the left and a potted plant on the right. Do you recognize this door? Did you find it?",
-      "stillMissing"
+      OVER_24_HOURS ? "claimOffer" : "wait"
     ),
     card: "photo",
     replies: [
       ["Yes, I found it", "resolved"],
-      ["No, it's not there", "stillMissing"],
+      ["No, it's not there", OVER_24_HOURS ? "claimOffer" : "wait"],
       ["That's not my door", "wrongAddress"],
     ],
   },
@@ -154,18 +162,8 @@ const FLOW = {
     ],
   },
 
-  stillMissing: {
-    text: "I'm sorry, we've checked all the usual places. Was it delivered more than 24 hours ago?",
-    yes: "claimOffer",
-    no: "wait",
-    replies: [
-      ["Yes, more than 24 hours", "claimOffer"],
-      ["No, less than 24 hours", "wait"],
-    ],
-  },
-
   claimOffer: {
-    text: "Since it's been more than 24 hours, the next step is a missing-package claim. I can open it for you right now, or connect you with an agent. What would you prefer?",
+    text: "I'm sorry, we've checked all the usual places. Since it was delivered more than 24 hours ago, the next step is a missing-package claim. I can open it for you right now, or connect you with an agent. What would you prefer?",
     yes: "claim",
     replies: [
       ["Open a claim", "claim"],
@@ -174,7 +172,7 @@ const FLOW = {
   },
 
   wait: {
-    text: "Packages marked delivered sometimes show up within a day. Please check again tomorrow. If it still isn't there, come back and I'll open a claim for you.",
+    text: "I'm sorry, we've checked all the usual places. It was delivered less than 24 hours ago, and packages marked delivered sometimes show up within a day. Please check again tomorrow. If it still isn't there, come back and I'll open a claim for you.",
     replies: [
       ["Open a claim anyway", "claim"],
       ["Talk to an agent", "human"],
@@ -185,7 +183,7 @@ const FLOW = {
   claim: {
     onEnter: openClaim,
     text: () =>
-      `Done. I've opened a missing-package claim for you. Your claim number is ${claim.number}. Our claims team will email you within 3 business days. If you haven't heard from us by ${claim.followUpBy}, contact eGain Support and give them this claim number.`,
+      `Done. I've opened a missing-package claim for you. Your claim number is ${claim.number}. Our claims team will email you within 3 business days. If you haven't heard from us by ${claim.followUpBy}, contact TechWorld Support and give them this claim number.`,
     card: "claim",
     replies: [
       ["Talk to an agent now", "human"],
@@ -207,7 +205,7 @@ const FLOW = {
     text: () =>
       `I've added you to the queue. The next available agent will join this chat in about 2 minutes, so please stay here. I've shared your tracking number, delivery details and the places you checked${claim ? `, plus your claim number ${claim.number}` : ""}, so you won't have to repeat yourself.`,
     retry: "Jordan from our support team will join this chat shortly. Please stay here.",
-    agentJoins: "Hi, I'm Jordan from eGain Support. I've read your conversation with Ava, so I have all the details. Give me a moment while I look into your package.",
+    agentJoins: "Hi, I'm Jordan from TechWorld Support. I've read your conversation with Ava, so I have all the details. Give me a moment while I look into your package.",
     replies: [["Start over", "start"]],
   },
 };
@@ -217,13 +215,14 @@ const FLOW = {
 
 const NOT_UNDERSTOOD = "Sorry, I didn't catch that. I can help with tracking and missing packages. Pick an option below or rephrase.";
 
-const NO_WORDS = ["no", "nope", "nah", "not there", "not here", "nothing", "already checked", "can't find", "cant find", "still missing", "don't have", "dont have", "less than"];
+const NO_WORDS = ["no", "nope", "nah", "not there", "not here", "nothing", "isn't", "isnt", "wasn't", "wasnt", "already checked", "can't find", "cant find", "still missing", "don't have", "dont have"];
 
-const YES_WORDS = ["yes", "yeah", "yep", "yup", "sure", "found it", "got it", "it's here", "its here", "they had it", "more than"];
+const YES_WORDS = ["yes", "yeah", "yep", "yup", "sure", "found it", "got it", "it's here", "its here", "they had it"];
 
 const KEYWORDS = {
-  human: ["agent", "human", "person", "someone"],
+  human: ["agent", "human", "representative", "real person", "talk to someone", "speak to someone", "talk to a person", "speak to a person"],
   start: ["start over", "restart"],
   wrongAddress: ["not my door", "not my house", "wrong address"],
-  askTracking: ["missing", "lost", "track", "can't find", "cant find", "delivered", "package"],
 };
+
+const PACKAGE_WORDS = ["missing", "lost", "track", "can't find", "cant find", "delivered", "package"];

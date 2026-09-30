@@ -44,7 +44,7 @@ function goTo(stepName, text) {
 
     if (step.agentJoins && !isRetry) {
       setTimeout(() => {
-        if (currentStep === stepName) show(agentBubble("Jordan · eGain Support", step.agentJoins));
+        if (currentStep === stepName) show(agentBubble("Jordan · TechWorld Support", step.agentJoins));
       }, 3000);
     }
   }, 500);
@@ -63,7 +63,7 @@ function mentions(text, words) {
 }
 
 function understand(text) {
-  const typed = text.toLowerCase().replace(/[.,!?]/g, "");
+  const typed = text.toLowerCase().replace(/[’‘]/g, "'").replace(/[.,!?]/g, "");
   const step = FLOW[currentStep];
 
   if (step.asksTracking) {
@@ -77,7 +77,11 @@ function understand(text) {
   if (step.no && mentions(typed, NO_WORDS)) return step.no;
   if (step.yes && mentions(typed, [...YES_WORDS, ...(step.yesWords || [])])) return step.yes;
 
-  return Object.keys(KEYWORDS).find(next => mentions(typed, KEYWORDS[next])) || null;
+  const keyword = Object.keys(KEYWORDS).find(next => mentions(typed, KEYWORDS[next]));
+  if (keyword) return keyword;
+
+  if (currentStep === "start" && mentions(typed, PACKAGE_WORDS)) return "askTracking";
+  return null;
 }
 
 
