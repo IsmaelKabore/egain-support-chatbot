@@ -1,0 +1,8 @@
+{
+  "name": "egain-support-chatbot",
+  "version": "1.0.0",
+  "description": "eGain package assistant: a chatbot that helps customers find missing packages.",
+  "private": true,
+  "author": "Ismaël Kaboré",
+  "license": "MIT"
+}

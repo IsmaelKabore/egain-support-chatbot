@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eGain Package Assistant</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div>
+      <p class="brand-name">eGain</p>
+      <p class="brand-title">Package Support</p>
+      <p class="brand-subtitle">Customer service assistant</p>
+
+      <nav class="navigation">
+        <button type="button" class="nav-item" data-label="Start over" data-step="start">💬 New conversation</button>
+        <button type="button" class="nav-item" data-label="My package is missing" data-step="askTracking">📦 Missing package</button>
+        <button type="button" class="nav-item" data-label="Talk to an agent" data-step="human">🧑‍💼 Talk to an agent</button>
+      </nav>
+    </div>
+
+    <div class="ava-card">
+      <span class="ava-large">👩🏻‍💼</span>
+      <h2>Meet Ava</h2>
+      <p>Ava helps you find packages marked delivered that you can't find.</p>
+      <ul>
+        <li>Looks up your delivery details</li>
+        <li>Walks you through likely spots</li>
+        <li>Opens a claim or brings in a person</li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="chat">
+    <header class="chat-header">
+      <span class="avatar">👩🏻‍💼</span>
+      <div>
+        <strong>Ava</strong>
+        <small>eGain package assistant</small>
+      </div>
+    </header>
+
+    <div id="messages" class="messages" aria-live="polite"></div>
+
+    <footer class="chat-footer">
+      <div id="replies" class="replies"></div>
+      <form id="form" class="input-row">
+        <input id="input" type="text" placeholder="Type a message or tracking number" autocomplete="off" />
+        <button type="submit" aria-label="Send">➤</button>
+      </form>
+    </footer>
+  </main>
+
+  <script src="flow.js"></script>
+  <script src="interface.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
